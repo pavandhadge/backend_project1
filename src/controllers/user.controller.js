@@ -1,6 +1,6 @@
 import {asynchandler} from "../utils/asynchandler.js"
 import {ApiError} from "../utils/apierror.js"
-import { User } from "../models/user.models.js";
+import  {User}  from "../models/user.models.js";
 import {uploadonCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiresponse.js";
 import { response } from "express";
@@ -20,7 +20,7 @@ const registerUser = asynchandler(async(req,res)=>{
 
     //getting user details
     const {fullname,email,username,password}=req.body;
-    console.log("email :",email);
+    //console.log("email :",email);
 
     //old method
     /*
@@ -46,7 +46,7 @@ const registerUser = asynchandler(async(req,res)=>{
         throw new ApiError(400,"Please fill all compalsery fields")
     }
 
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({
         $or:[{username} , {email}] //$or: is used to give any arguments at once ,see on google 
     })
     if(existingUser){
@@ -55,10 +55,13 @@ const registerUser = asynchandler(async(req,res)=>{
 
     //multer give file access to us
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
-    console.log(`${avatarLocalPath}`)
-    console.log(`${coverImageLocalPath}`)
-
+    //const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    //console.log(`${avatarLocalPath}`)
+    //console.log(`${coverImageLocalPath}`)
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length >0){//is array chaeck if argument is an array
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
 
     if(!avatarLocalPath){
         throw new ApiError(400,"avatar is compalsery")
@@ -67,11 +70,13 @@ const registerUser = asynchandler(async(req,res)=>{
     const avatar = await uploadonCloudinary(avatarLocalPath)
     const coverImage = await uploadonCloudinary(coverImageLocalPath)
 
+
+
     if(!avatar){
         throw new ApiError(400,"avatar file is required")
     }
 
-    const User = await User.create({
+    const newUser = await User.create({
         fullname,
         avatar : avatar.url,
         coverImage:coverImage?.url || "",// ? used to give indication that it is opetionsl
@@ -80,7 +85,7 @@ const registerUser = asynchandler(async(req,res)=>{
         username : username.toLowerCase()
     })
 
-    const createdUser = await User.findById(user._id).select(
+    const createdUser = await User.findById(newUser._id).select(
         "-password -refreshToken"//desect given item by default all the items are selected
     )
 
