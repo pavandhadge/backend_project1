@@ -3,7 +3,7 @@ import {ApiError} from "../utils/apierror.js"
 import  {User}  from "../models/user.models.js";
 import {uploadonCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiresponse.js";
-import { response } from "express";
+import { response } from "express"; 
 
 
 
@@ -11,12 +11,15 @@ import { response } from "express";
 const generateAccessTokenandRefreshToken = async(userId)=>{
     try{
         const foundUser = await User.findById(userId)
+        console.log("1")
+        console.log(foundUser)
         const AccessToken = foundUser.generateAccessToken()
+        console.log("1")
         const RefreshToken = foundUser.generateRefreshToken()
+        console.log("1")
         
         foundUser.refreshToken = RefreshToken
         await foundUser.save({validateBeforeSave:false})
-        
         return {AccessToken,RefreshToken}
     }catch(error){
         throw new ApiError(500,"something went wrong while generation access and refresh token")
@@ -144,7 +147,7 @@ const loginUser = asynchandler(async (req,res)=>{
         throw new ApiError(401,"INvaild password")
     }
 
-    const {AccessToken,RefreshToken}=await generateAccessTokenandRefreshToken(_id)
+    const {AccessToken,RefreshToken}=await generateAccessTokenandRefreshToken(foundUser._id)
 
     //updating token by calling in db
     //const loggedinUser = await User.findById(foundUser._id).select("-password -refreshToken")
