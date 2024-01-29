@@ -11,12 +11,12 @@ import { response } from "express";
 const generateAccessTokenandRefreshToken = async(userId)=>{
     try{
         const foundUser = await User.findById(userId)
-        console.log("1")
+        // console.log("1")
         console.log(foundUser)
         const AccessToken = foundUser.generateAccessToken()
-        console.log("1")
+        // console.log("1")
         const RefreshToken = foundUser.generateRefreshToken()
-        console.log("1")
+        // console.log("1")
         
         foundUser.refreshToken = RefreshToken
         await foundUser.save({validateBeforeSave:false})
