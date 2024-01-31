@@ -199,4 +199,12 @@ const logoutUser = asynchandler(async (req,res)=>{
     )
 })
 
+const refreshAccessToken = asynchandler(async(req,res)=>{
+
+    const incommingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+    if(!incommingRefreshToken){
+        throw new ApiError(404,)
+    }
+})
+
 export {registerUser,loginUser,logoutUser}
