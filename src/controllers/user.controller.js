@@ -233,4 +233,34 @@ try {
 }
 })
 
-export {registerUser,loginUser,logoutUser,refreshAccessToken}
+
+const changeCurrentPass = asynchandler(async(req,res)=>{
+    const {oldPassword,newPassword}= req.body
+    const founduser = await User.findById(req.user?.id)
+    const ispasswordcorrect = await founduser.isPasswordCorrect(oldPassword)
+    if(!ispasswordcorrect){
+        throw new ApiError(400,"Invalid old password")
+    }
+    User.password = newPassword
+    await User.save({validateBeforeSave:false})
+
+    return res.status(200)
+    .json(new ApiResponse(200,{},"Password Change Successfull"))
+})
+
+const getCurrentUser = asynchandler(async(req,res)=>{
+    return res.status(200)
+    .json(200,req.user,"current user fetched successfully")
+})
+
+const updateUserDetails = asynchandler(async(req,res)=>{
+    const {}=req.body
+})
+
+export {registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    getCurrentUser,
+    changeCurrentPass
+}
